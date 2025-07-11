@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -26,7 +26,6 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const Users = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const context = useContext(MyContext);
   const [page, setPage] = useState(0);
 
   const handleChangePage = (event, newPage) => {

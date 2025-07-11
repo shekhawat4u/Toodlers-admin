@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard";
 import Header from "./Components/Header";
@@ -27,6 +27,10 @@ import Orders from "./Pages/Orders";
 import ForgotPassword from "./Pages/ForgotPassword";
 import VerifyAccount from "./Pages/VerifyAccount";
 import ChangePassword from "./Pages/ChangePassword";
+import toast, { Toaster } from "react-hot-toast";
+import { fetchDataFromApi } from "./utils/api";
+import Profile from "./Pages/Profile";
+import AddAddress from "./Pages/Address/addAddress";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -36,11 +40,43 @@ const MyContext = createContext();
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
+  const [userData, setUserData] = useState(null);
+   const [address, setAddress] = useState([]);
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
     model: "",
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token !== undefined && token !== null && token !== "") {
+      setIsLogin(true);
+      fetchDataFromApi(`/api/user/user-details`).then((res) => {
+        setUserData(res.data);
+        if (res?.response?.data?.error === true) {
+          if (res?.response?.data?.message === "You have to login") {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            alertBox("error", "You have to login");
+            window.location.href = "/login";
+            setIsLogin(false);
+          }
+        }
+      });
+    } else {
+      setIsLogin(false);
+    }
+  }, [isLogin]);
+
+  const alertBox = (type, msg) => {
+    if (type === "success") {
+      toast.success(msg);
+    }
+    if (type === "error") {
+      toast.error(msg);
+    }
+  };
 
   const router = createBrowserRouter([
     {
@@ -277,6 +313,33 @@ function App() {
         </>
       ),
     },
+    {
+      path: "/profile",
+      exact: true,
+      element: (
+        <>
+          <section className="main">
+            <Header />
+            <div className="contentMain flex">
+              <div
+                className={`oveflow-hidden sidebarWrapper ${
+                  isSidebarOpen === true ? "w-[17%]" : "w-[0px] opacity-0"
+                } transition-all`}
+              >
+                <Sidebar />
+              </div>
+              <div
+                className={`contentRight py-4 px-5 ${
+                  isSidebarOpen === false ? "w-[100%]" : "w-[82%]"
+                } transition-all`}
+              >
+                <Profile />
+              </div>
+            </div>
+          </section>
+        </>
+      ),
+    },
   ]);
 
   const values = {
@@ -286,11 +349,17 @@ function App() {
     setIsLogin,
     isOpenFullScreenPanel,
     setIsOpenFullScreenPanel,
+    userData,
+    setUserData,
+    alertBox,
+    address,
+    setAddress,
   };
 
   return (
     <>
       <MyContext.Provider value={values}>
+        <Toaster />
         <RouterProvider router={router} />
 
         <Dialog
@@ -336,6 +405,9 @@ function App() {
           )}
           {isOpenFullScreenPanel?.model === "Add New Sub Category" && (
             <AddSubCategory />
+          )}
+          {isOpenFullScreenPanel?.model === "Add New Address" && (
+            <AddAddress />
           )}
         </Dialog>
       </MyContext.Provider>

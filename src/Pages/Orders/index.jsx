@@ -154,7 +154,7 @@ const Orders = () => {
                       <tbody>
                         <tr className="bg-white border-b">
                           <td className="px-6 py-4">
-                            {" "}
+                            
                             <span className="text-gray-600">2378462874254</span>
                           </td>
                           <td className="px-6 py-4">
@@ -172,7 +172,7 @@ const Orders = () => {
                         </tr>
                         <tr className="bg-white border-b">
                           <td className="px-6 py-4">
-                            {" "}
+                            
                             <span className="text-gray-600">2378462874254</span>
                           </td>
                           <td className="px-6 py-4">
@@ -284,7 +284,7 @@ const Orders = () => {
                       <tbody>
                         <tr className="bg-white border-b">
                           <td className="px-6 py-4">
-                            {" "}
+                            
                             <span className="text-gray-600">2378462874254</span>
                           </td>
                           <td className="px-6 py-4">
@@ -302,7 +302,7 @@ const Orders = () => {
                         </tr>
                         <tr className="bg-white border-b">
                           <td className="px-6 py-4">
-                            {" "}
+                            
                             <span className="text-gray-600">2378462874254</span>
                           </td>
                           <td className="px-6 py-4">

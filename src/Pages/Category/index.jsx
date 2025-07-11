@@ -128,7 +128,7 @@ const CategoryList = () => {
                   </div>
                 </TableCell>
               </TableRow>
-            </TableBody>{" "}
+            </TableBody>
             <TableBody>
               <TableRow>
                 <TableCell>
@@ -167,7 +167,7 @@ const CategoryList = () => {
                   </div>
                 </TableCell>
               </TableRow>
-            </TableBody>{" "}
+            </TableBody>
             <TableBody>
               <TableRow>
                 <TableCell>

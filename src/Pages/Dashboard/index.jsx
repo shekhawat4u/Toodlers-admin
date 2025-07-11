@@ -153,7 +153,7 @@ const Dashboard = () => {
         <div className="info">
           <h1 className="text-[35px] font-bold leading-10 mb-3">
             Good Morning,
-            <br /> Harshvardhan{" "}
+            <br /> Harshvardhan
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 128 128"
@@ -204,7 +204,7 @@ const Dashboard = () => {
       <div className="card my-4 shadow-md sm:rounded-lg bg-white">
         <div className="flex items-center justify-between px-5 py-5">
           <h2 className="text-[18px] font-[600]">
-            Products{" "}
+            Products
             <span className="font-[400] text-[14px]">(Tailwind CSS Table)</span>
           </h2>
         </div>
@@ -698,7 +698,7 @@ const Dashboard = () => {
       <div className="card my-4 shadow-md sm:rounded-lg bg-white">
         <div className="flex items-center justify-between px-5 py-5">
           <h2 className="text-[18px] font-[600]">
-            Products{" "}
+            Products
             <span className="font-[400] text-[14px]">(Material UI Table)</span>
           </h2>
         </div>
@@ -1179,7 +1179,7 @@ const Dashboard = () => {
                         <tbody>
                           <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                              {" "}
+                              
                               <span className="text-gray-600">
                                 2378462874254
                               </span>
@@ -1199,7 +1199,7 @@ const Dashboard = () => {
                           </tr>
                           <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                              {" "}
+                              
                               <span className="text-gray-600">
                                 2378462874254
                               </span>
@@ -1315,7 +1315,7 @@ const Dashboard = () => {
                         <tbody>
                           <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                              {" "}
+                              
                               <span className="text-gray-600">
                                 2378462874254
                               </span>
@@ -1335,7 +1335,7 @@ const Dashboard = () => {
                           </tr>
                           <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                              {" "}
+                              
                               <span className="text-gray-600">
                                 2378462874254
                               </span>

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { Button, Rating } from "@mui/material";
 import UploadBox from "../../Components/UploadBox";
