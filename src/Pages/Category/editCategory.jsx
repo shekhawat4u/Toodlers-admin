@@ -4,21 +4,33 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { Button } from "@mui/material";
-import { deleteImages, postData } from "../../utils/api";
+import {
+  deleteImages,
+  editData,
+  fetchDataFromApi,
+  postData,
+} from "../../utils/api";
 import { MyContext } from "../../App";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const AddCategory = () => {
+const EditCategory = () => {
   const [previews, setPreviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const context = useContext(MyContext);
-  const history = useNavigate();
 
   const [formFields, setFormFields] = useState({
     name: "",
     images: [],
   });
+
+  useEffect(() => {
+    const id = context?.isOpenFullScreenPanel?.id;
+    fetchDataFromApi(`/api/category/${id}`).then((res) => {
+      formFields.name = res?.category?.name;
+      setPreviews(res?.category?.images);
+    });
+  }, []);
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
@@ -28,6 +40,7 @@ const AddCategory = () => {
         [name]: value,
       };
     });
+    formFields.images = previews;
   };
 
   const setPreviewsFun = (previewsArr) => {
@@ -43,7 +56,7 @@ const AddCategory = () => {
       setPreviews([]);
       setTimeout(() => {
         setPreviews(imageArr);
-        formFields.images = imageArr;
+        formFields.images = previewsArr;
       }, 100);
     });
   };
@@ -63,7 +76,10 @@ const AddCategory = () => {
       return false;
     }
 
-    postData("/api/category/create", formFields).then((res) => {
+    editData(
+      `/api/category/${context?.isOpenFullScreenPanel?.id}`,
+      formFields
+    ).then((res) => {
       console.log(res);
 
       setTimeout(() => {
@@ -71,8 +87,6 @@ const AddCategory = () => {
         context.setIsOpenFullScreenPanel({
           open: false,
         });
-        context?.getCat();
-        history("/category/list");
       }, 2500);
     });
   };
@@ -146,4 +160,4 @@ const AddCategory = () => {
   );
 };
 
-export default AddCategory;
+export default EditCategory;

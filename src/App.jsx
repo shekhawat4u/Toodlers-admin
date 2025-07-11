@@ -8,20 +8,10 @@ import { createContext, useState } from "react";
 import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import Products from "./Pages/Products";
-import AddProduct from "./Pages/Products/addProduct";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
-import { IoMdClose } from "react-icons/io";
 import HomeSliderBanners from "./Pages/HomeSliderBanners";
-import AddHomeSlide from "./Pages/HomeSliderBanners/addHomeSlide";
 import CategoryList from "./Pages/Category";
-import AddCategory from "./Pages/Category/addCategory";
 import SubCategoryList from "./Pages/Category/subCatList";
-import AddSubCategory from "./Pages/Category/addSubCategory";
 import Users from "./Pages/Users";
 import Orders from "./Pages/Orders";
 import ForgotPassword from "./Pages/ForgotPassword";
@@ -30,7 +20,6 @@ import ChangePassword from "./Pages/ChangePassword";
 import toast, { Toaster } from "react-hot-toast";
 import { fetchDataFromApi } from "./utils/api";
 import Profile from "./Pages/Profile";
-import AddAddress from "./Pages/Address/addAddress";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -42,11 +31,12 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(null);
-   const [address, setAddress] = useState([]);
+  const [address, setAddress] = useState([]);
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
-    model: "",
+    id: "",
   });
+  const [catData, setCatData] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -342,6 +332,16 @@ function App() {
     },
   ]);
 
+  useEffect(() => {
+    getCat();
+  }, []);
+
+  const getCat = () => {
+    fetchDataFromApi("/api/category").then((res) => {
+      setCatData(res?.data);
+    });
+  };
+
   const values = {
     isSidebarOpen,
     setIsSidebarOpen,
@@ -354,6 +354,9 @@ function App() {
     alertBox,
     address,
     setAddress,
+    catData,
+    setCatData,
+    getCat,
   };
 
   return (
@@ -361,55 +364,6 @@ function App() {
       <MyContext.Provider value={values}>
         <Toaster />
         <RouterProvider router={router} />
-
-        <Dialog
-          fullScreen
-          open={isOpenFullScreenPanel.open}
-          onClose={() =>
-            setIsOpenFullScreenPanel({
-              open: false,
-            })
-          }
-          slots={{
-            transition: Transition,
-          }}
-        >
-          <AppBar sx={{ position: "relative" }}>
-            <Toolbar>
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={() =>
-                  setIsOpenFullScreenPanel({
-                    open: false,
-                  })
-                }
-                aria-label="close"
-              >
-                <IoMdClose className="text-gray-800" />
-              </IconButton>
-              <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                <span className="text-gray-800">
-                  {isOpenFullScreenPanel?.model}
-                </span>
-              </Typography>
-            </Toolbar>
-          </AppBar>
-          {isOpenFullScreenPanel?.model === "Add Product" && <AddProduct />}
-
-          {isOpenFullScreenPanel?.model === "Add Home Slide" && (
-            <AddHomeSlide />
-          )}
-          {isOpenFullScreenPanel?.model === "Add New Category" && (
-            <AddCategory />
-          )}
-          {isOpenFullScreenPanel?.model === "Add New Sub Category" && (
-            <AddSubCategory />
-          )}
-          {isOpenFullScreenPanel?.model === "Add New Address" && (
-            <AddAddress />
-          )}
-        </Dialog>
       </MyContext.Provider>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { Button, Rating } from "@mui/material";
@@ -7,18 +7,18 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
-import { deleteImages, postData } from "../../utils/api";
+import { deleteImages, editData, fetchDataFromApi } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 
-const AddProduct = () => {
+const EditProduct = () => {
   const [formFields, setFormFields] = useState({
     name: "",
     description: "",
     images: [],
     brand: "",
     price: "",
-    category:"",
+    category: "",
     oldPrice: "",
     catName: "",
     catId: "",
@@ -58,6 +58,42 @@ const AddProduct = () => {
   const [previews, setPreviews] = useState([]);
   const context = useContext(MyContext);
   const history = useNavigate();
+
+  useEffect(() => {
+    fetchDataFromApi(`/api/product/${context?.isOpenFullScreenPanel?.id}`).then(
+      (res) => {
+        setFormFields({
+          name: res?.product?.name,
+          description: res?.product?.description,
+          images: res?.product?.images,
+          brand: res?.product?.brand,
+          price: res?.product?.price,
+          category: res?.product?.category,
+          oldPrice: res?.product?.oldPrice,
+          catName: res?.product?.catName,
+          catId: res?.product?.catId,
+          subCat: res?.product?.subCat,
+          subCatId: res?.product?.subCatId,
+          thirdsubCatId: res?.product?.thirdsubCatId,
+          countInStock: res?.product?.countInStock,
+          rating: res?.product?.rating,
+          isFeatured: res?.product?.isFeatured,
+          discount: res?.product?.discount,
+          productRam: res?.product?.productRam,
+          size: res?.product?.size,
+          productWeight: res?.product?.productWeight,
+        });
+        setProductCat(res?.product?.catId);
+        setProductSubCat(res?.product?.subCatId);
+        setProductThirdLevelCat(res?.product?.thirdsubCatId);
+        setProductRams(res?.product?.productRam);
+        setProductFeatured(res?.product?.isFeatured);
+        setProductWeight(res?.product?.productWeight);
+        setProductSize(res?.product?.size);
+        setPreviews(res?.product?.images);
+      }
+    );
+  }, []);
 
   const handleChangeProductCat = (event) => {
     setProductCat(event.target.value);
@@ -201,9 +237,12 @@ const AddProduct = () => {
 
     setIsLoading(true);
 
-    postData("/api/product/create", formFields).then((res) => {
-      if (res?.error === false) {
-        context.alertBox("success", res?.message);
+    editData(
+      `/api/product/updateProduct/${context?.isOpenFullScreenPanel?.id}`,
+      formFields
+    ).then((res) => {
+      if (res?.data?.error === false) {
+        context.alertBox("success", res?.data?.message);
 
         setTimeout(() => {
           setIsLoading(false);
@@ -213,8 +252,8 @@ const AddProduct = () => {
           history("/products");
         }, 1000);
       } else {
-         setIsLoading(false);
-        context.alertBox("error", res?.message);
+        setIsLoading(false);
+        context.alertBox("error", res?.data?.message);
       }
     });
   };
@@ -272,6 +311,7 @@ const AddProduct = () => {
                   {context?.catData?.map((cat, item) => {
                     return (
                       <MenuItem
+                        key={item}
                         value={cat?._id}
                         onClick={() => selectCatByName(cat?.name)}
                       >
@@ -297,12 +337,13 @@ const AddProduct = () => {
                   label="Sub Category"
                   onChange={handleChangeProductSubCat}
                 >
-                  {context?.catData?.map((cat, item) => {
+                  {context?.catData?.map((cat, index) => {
                     return (
                       cat?.children?.length !== 0 &&
                       cat?.children?.map((subCat, index_) => {
                         return (
                           <MenuItem
+                            key={index}
                             value={subCat?._id}
                             onClick={() => selectSubCatByName(subCat?.name)}
                           >
@@ -506,9 +547,8 @@ const AddProduct = () => {
                 Product Rating
               </h3>
               <Rating
-                name="half-rating"
-                defaultValue={1}
-                precision={0.5}
+                name="rating"
+                value={formFields.rating}
                 onChange={onChangeRating}
               />
             </div>
@@ -560,4 +600,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;
