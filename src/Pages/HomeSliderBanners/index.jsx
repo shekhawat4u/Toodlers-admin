@@ -51,7 +51,7 @@ const HomeSliderBanners = () => {
       <div className="flex items-center justify-between px-2 py-0 mt-3">
         <h2 className="text-[18px] font-[600]">Home Slider Banners</h2>
 
-        <div className="col w-[25%] ml-auto flex justify-end items-center gap-3">
+        <div className="col w-[30%] ml-auto flex justify-end items-center gap-3">
           <Button className="btn-blue !bg-green-600 btn-sm flex items-center gap-1">
             <BiExport className="text-[18px]" />
             Export

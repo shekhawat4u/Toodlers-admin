@@ -30,7 +30,6 @@ const EditProduct = () => {
     rating: "",
     isFeatured: false,
     discount: "",
-    productRam: [],
     size: [],
     productWeight: [],
   });
@@ -48,10 +47,11 @@ const EditProduct = () => {
   const [productCat, setProductCat] = useState("");
   const [productSubCat, setProductSubCat] = useState("");
   const [productThirdLevelCat, setProductThirdLevelCat] = useState("");
-  const [productRams, setProductRams] = useState([]);
   const [productFeatured, setProductFeatured] = useState("");
   const [productWeight, setProductWeight] = useState([]);
   const [productSize, setProductSize] = useState([]);
+  const [productWeightData, setProductWeightData] = useState([]);
+  const [productSizeData, setProductSizeData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,40 +60,52 @@ const EditProduct = () => {
   const history = useNavigate();
 
   useEffect(() => {
-    fetchDataFromApi(`/api/product/${context?.isOpenFullScreenPanel?.id}`).then(
-      (res) => {
-        setFormFields({
-          name: res?.product?.name,
-          description: res?.product?.description,
-          images: res?.product?.images,
-          brand: res?.product?.brand,
-          price: res?.product?.price,
-          category: res?.product?.category,
-          oldPrice: res?.product?.oldPrice,
-          catName: res?.product?.catName,
-          catId: res?.product?.catId,
-          subCat: res?.product?.subCat,
-          subCatId: res?.product?.subCatId,
-          thirdsubCatId: res?.product?.thirdsubCatId,
-          countInStock: res?.product?.countInStock,
-          rating: res?.product?.rating,
-          isFeatured: res?.product?.isFeatured,
-          discount: res?.product?.discount,
-          productRam: res?.product?.productRam,
-          size: res?.product?.size,
-          productWeight: res?.product?.productWeight,
-        });
-        setProductCat(res?.product?.catId);
-        setProductSubCat(res?.product?.subCatId);
-        setProductThirdLevelCat(res?.product?.thirdsubCatId);
-        setProductRams(res?.product?.productRam);
-        setProductFeatured(res?.product?.isFeatured);
-        setProductWeight(res?.product?.productWeight);
-        setProductSize(res?.product?.size);
-        setPreviews(res?.product?.images);
+    fetchDataFromApi("/api/product/productSIZE/get").then((res) => {
+      if (res?.error === false) {
+        setProductSizeData(res?.data);
       }
-    );
-  }, []);
+    });
+
+    fetchDataFromApi("/api/product/productWEIGHT/get").then((res) => {
+      if (res?.error === false) {
+        setProductWeightData(res?.data);
+      }
+    });
+
+    if (context?.isOpenFullScreenPanel?.id) {
+      fetchDataFromApi(`/api/product/${context?.isOpenFullScreenPanel?.id}`).then(
+        (res) => {
+          setFormFields({
+            name: res?.product?.name,
+            description: res?.product?.description,
+            images: res?.product?.images,
+            brand: res?.product?.brand,
+            price: res?.product?.price,
+            category: res?.product?.category,
+            oldPrice: res?.product?.oldPrice,
+            catName: res?.product?.catName,
+            catId: res?.product?.catId,
+            subCat: res?.product?.subCat,
+            subCatId: res?.product?.subCatId,
+            thirdsubCatId: res?.product?.thirdsubCatId,
+            countInStock: res?.product?.countInStock,
+            rating: res?.product?.rating,
+            isFeatured: res?.product?.isFeatured,
+            discount: res?.product?.discount,
+            size: res?.product?.size,
+            productWeight: res?.product?.productWeight,
+          });
+          setProductCat(res?.product?.catId);
+          setProductSubCat(res?.product?.subCatId);
+          setProductThirdLevelCat(res?.product?.thirdsubCatId);
+          setProductFeatured(res?.product?.isFeatured);
+          setProductWeight(res?.product?.productWeight);
+          setProductSize(res?.product?.size);
+          setPreviews(res?.product?.images);
+        }
+      );
+    }
+  }, [context?.isOpenFullScreenPanel?.id]);
 
   const handleChangeProductCat = (event) => {
     setProductCat(event.target.value);
@@ -128,14 +140,6 @@ const EditProduct = () => {
     formFields.isFeatured = event.target.value;
   };
 
-  const handleChangeProductRams = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setProductRams(typeof value === "string" ? value.split(",") : value);
-    formFields.productRam = value;
-  };
-
   const handleChangeProductWeight = (event) => {
     const {
       target: { value },
@@ -167,7 +171,7 @@ const EditProduct = () => {
   const removeImg = (image, index) => {
     var imageArr = [];
     imageArr = previews;
-    deleteImages(`/api/category/deleteImage?img=${image}`).then((res) => {
+    deleteImages(`/api/category/deleteImage?img=${image}`).then(() => {
       imageArr.splice(index, 1);
       setPreviews([]);
       setTimeout(() => {
@@ -337,13 +341,13 @@ const EditProduct = () => {
                   label="Sub Category"
                   onChange={handleChangeProductSubCat}
                 >
-                  {context?.catData?.map((cat, index) => {
+                  {context?.catData?.map((cat) => {
                     return (
                       cat?.children?.length !== 0 &&
-                      cat?.children?.map((subCat, index_) => {
+                      cat?.children?.map((subCat) => {
                         return (
                           <MenuItem
-                            key={index}
+                            key={subCat?._id}
                             value={subCat?._id}
                             onClick={() => selectSubCatByName(subCat?.name)}
                           >
@@ -482,62 +486,54 @@ const EditProduct = () => {
 
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
-                Product RAMS
-              </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productRams}
-                label="Category"
-                onChange={handleChangeProductRams}
-              >
-                <MenuItem value={"4GB"}>4GB</MenuItem>
-                <MenuItem value={"6GB"}>6GB</MenuItem>
-                <MenuItem value={"8GB"}>8GB</MenuItem>
-              </Select>
-            </div>
-
-            <div className="col">
-              <h3 className="text-[14px] font-[500] mb-1 text-black">
                 Product Weight
               </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productWeight}
-                label="Category"
-                onChange={handleChangeProductWeight}
-              >
-                <MenuItem value={10}>2KG</MenuItem>
-                <MenuItem value={20}>4KG</MenuItem>
-                <MenuItem value={30}>5KG</MenuItem>
-              </Select>
+              {productWeightData?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full"
+                  size="small"
+                  value={productWeight}
+                  label="Category"
+                  onChange={handleChangeProductWeight}
+                >
+                  {productWeightData?.map((item, index) => {
+                    return (
+                      <MenuItem value={index} key={index}>
+                        {item?.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
             </div>
 
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
                 Product Size
               </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productSize}
-                label="Category"
-                onChange={handleChangeProductSize}
-              >
-                <MenuItem value={"S"}>S</MenuItem>
-                <MenuItem value={"M"}>M</MenuItem>
-                <MenuItem value={"L"}>L</MenuItem>
-              </Select>
+              {productSizeData?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full"
+                  size="small"
+                  value={productSize}
+                  label="Category"
+                  onChange={handleChangeProductSize}
+                >
+                  {productSizeData?.map((item, index) => {
+                    return (
+                      <MenuItem value={index} key={index}>
+                        {item?.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
             </div>
           </div>
 
@@ -584,6 +580,7 @@ const EditProduct = () => {
             </div>
           </div>
         </div>
+
         <hr /> <br />
         <Button type="submit" className="btn-blue btn-lg w-full flex gap-2">
           {isLoading === true ? (

@@ -7,9 +7,10 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { IoMdClose } from "react-icons/io";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { MyContext } from "../../App";
-import { deleteImages, postData } from "../../utils/api";
+import { deleteImages, fetchDataFromApi, postData } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useEffect } from "react";
 
 const AddProduct = () => {
   const [formFields, setFormFields] = useState({
@@ -18,7 +19,7 @@ const AddProduct = () => {
     images: [],
     brand: "",
     price: "",
-    category:"",
+    category: "",
     oldPrice: "",
     catName: "",
     catId: "",
@@ -30,7 +31,6 @@ const AddProduct = () => {
     rating: "",
     isFeatured: false,
     discount: "",
-    productRam: [],
     size: [],
     productWeight: [],
   });
@@ -48,16 +48,31 @@ const AddProduct = () => {
   const [productCat, setProductCat] = useState("");
   const [productSubCat, setProductSubCat] = useState("");
   const [productThirdLevelCat, setProductThirdLevelCat] = useState("");
-  const [productRams, setProductRams] = useState([]);
   const [productFeatured, setProductFeatured] = useState("");
   const [productWeight, setProductWeight] = useState([]);
+  const [productWeightData, setProductWeightData] = useState([]);
   const [productSize, setProductSize] = useState([]);
+  const [productSizeData, setProductSizeData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [previews, setPreviews] = useState([]);
   const context = useContext(MyContext);
   const history = useNavigate();
+
+  useEffect(() => {
+    fetchDataFromApi("/api/product/productSIZE/get").then((res) => {
+      if (res?.error === false) {
+        setProductSizeData(res?.data);
+      }
+    });
+
+    fetchDataFromApi("/api/product/productWEIGHT/get").then((res) => {
+      if (res?.error === false) {
+        setProductWeightData(res?.data);
+      }
+    });
+  }, []);
 
   const handleChangeProductCat = (event) => {
     setProductCat(event.target.value);
@@ -92,14 +107,6 @@ const AddProduct = () => {
     formFields.isFeatured = event.target.value;
   };
 
-  const handleChangeProductRams = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setProductRams(typeof value === "string" ? value.split(",") : value);
-    formFields.productRam = value;
-  };
-
   const handleChangeProductWeight = (event) => {
     const {
       target: { value },
@@ -131,7 +138,7 @@ const AddProduct = () => {
   const removeImg = (image, index) => {
     var imageArr = [];
     imageArr = previews;
-    deleteImages(`/api/category/deleteImage?img=${image}`).then((res) => {
+    deleteImages(`/api/category/deleteImage?img=${image}`).then(() => {
       imageArr.splice(index, 1);
       setPreviews([]);
       setTimeout(() => {
@@ -213,7 +220,7 @@ const AddProduct = () => {
           history("/products");
         }, 1000);
       } else {
-         setIsLoading(false);
+        setIsLoading(false);
         context.alertBox("error", res?.message);
       }
     });
@@ -441,62 +448,54 @@ const AddProduct = () => {
 
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
-                Product RAMS
-              </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productRams}
-                label="Category"
-                onChange={handleChangeProductRams}
-              >
-                <MenuItem value={"4GB"}>4GB</MenuItem>
-                <MenuItem value={"6GB"}>6GB</MenuItem>
-                <MenuItem value={"8GB"}>8GB</MenuItem>
-              </Select>
-            </div>
-
-            <div className="col">
-              <h3 className="text-[14px] font-[500] mb-1 text-black">
                 Product Weight
               </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productWeight}
-                label="Category"
-                onChange={handleChangeProductWeight}
-              >
-                <MenuItem value={10}>2KG</MenuItem>
-                <MenuItem value={20}>4KG</MenuItem>
-                <MenuItem value={30}>5KG</MenuItem>
-              </Select>
+              {productWeightData?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full"
+                  size="small"
+                  value={productWeight}
+                  label="Category"
+                  onChange={handleChangeProductWeight}
+                >
+                  {productWeightData?.map((item, index) => {
+                    return (
+                      <MenuItem value={index} key={index}>
+                        {item?.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
             </div>
 
             <div className="col">
               <h3 className="text-[14px] font-[500] mb-1 text-black">
                 Product Size
               </h3>
-              <Select
-                multiple
-                labelId="demo-simple-select-label"
-                id="productCatDrop"
-                className="w-full"
-                size="small"
-                value={productSize}
-                label="Category"
-                onChange={handleChangeProductSize}
-              >
-                <MenuItem value={"S"}>S</MenuItem>
-                <MenuItem value={"M"}>M</MenuItem>
-                <MenuItem value={"L"}>L</MenuItem>
-              </Select>
+              {productSizeData?.length !== 0 && (
+                <Select
+                  multiple
+                  labelId="demo-simple-select-label"
+                  id="productCatDrop"
+                  className="w-full"
+                  size="small"
+                  value={productSize}
+                  label="Category"
+                  onChange={handleChangeProductSize}
+                >
+                  {productSizeData?.map((item, index) => {
+                    return (
+                      <MenuItem value={index} key={index}>
+                        {item?.name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              )}
             </div>
           </div>
 

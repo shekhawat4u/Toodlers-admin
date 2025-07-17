@@ -98,8 +98,8 @@ export const deleteImages = async (url, image) => {
       "Content-Type": "application/json",
     },
   };
-  const { res } = await axios.delete(apiUrl + url, params);
-  return res;
+  const { data } = await axios.delete(apiUrl + url, params);
+  return data;
 };
 
 export const deleteData = async (url) => {
@@ -109,6 +109,25 @@ export const deleteData = async (url) => {
       "Content-Type": "application/json",
     },
   };
-  const { res } = await axios.delete(apiUrl + url, params);
-  return res;
+  const { data } = await axios.delete(apiUrl + url, params);
+  return data;
+};
+
+export const deleteMultipleData = async (url, ids) => {
+  const params = {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const response = await axios.delete(apiUrl + url, {
+      ...params,
+      data: { ids: ids },
+    });
+    return response.data;
+  } catch (error) {
+    return error.response?.data || error;
+  }
 };
